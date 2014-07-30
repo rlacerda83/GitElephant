@@ -67,21 +67,21 @@ class Repository
      *
      * @var string
      */
-    private $path;
+    protected $path;
 
     /**
      * the caller instance
      *
      * @var \GitElephant\Command\Caller\Caller
      */
-    private $caller;
+    protected $caller;
 
     /**
      * A general repository name
      *
      * @var string $name the repository name
      */
-    private $name;
+    protected $name;
 
     /**
      * Class constructor
@@ -89,17 +89,13 @@ class Repository
      * @param string         $repositoryPath the path of the git repository
      * @param GitBinary|null $binary         the GitBinary instance that calls the commands
      * @param string         $name           a repository name
-     *
-     * @throws Exception\InvalidRepositoryPathException
      */
     public function __construct($repositoryPath, GitBinary $binary = null, $name = null)
     {
         if ($binary == null) {
             $binary = new GitBinary();
         }
-        if (!is_dir($repositoryPath)) {
-            throw new InvalidRepositoryPathException($repositoryPath);
-        }
+
         $this->path = $repositoryPath;
         $this->caller = new Caller($binary, $repositoryPath);
         $this->name = $name;
@@ -113,9 +109,14 @@ class Repository
      * @param string         $name           a repository name
      *
      * @return \GitElephant\Repository
+     *
+     * @throws Exception\InvalidRepositoryPathException
      */
     public static function open($repositoryPath, GitBinary $binary = null, $name = null)
     {
+        if (!is_dir($repositoryPath)) {
+            throw new InvalidRepositoryPathException($repositoryPath);
+        }
         return new self($repositoryPath, $binary, $name);
     }
 
@@ -1016,7 +1017,7 @@ class Repository
     /**
      * Caller setter
      *
-     * @param \GitElephant\Command\Caller\Caller $caller the caller variable
+     * @param \GitElephant\Command\Caller\CallerInterface $caller the caller variable
      */
     public function setCaller($caller)
     {
@@ -1026,7 +1027,7 @@ class Repository
     /**
      * Caller getter
      *
-     * @return \GitElephant\Command\Caller\Caller
+     * @return \GitElephant\Command\Caller\CallerInterface
      */
     public function getCaller()
     {
