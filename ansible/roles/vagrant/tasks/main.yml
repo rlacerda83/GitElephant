@@ -1,0 +1,16 @@
+---
+  - name: upgrade apt packages
+    action: apt upgrade=safe
+
+  - name: install common packages
+    action: apt pkg={{ item }} state=latest update_cache=yes
+    with_items:
+      - htop
+      - vim
+
+  - name: add git-core ppa
+    action: apt_repository repo=ppa:git-core/ppa state=present
+
+  # PACKAGES
+  - name: install git
+    action: apt pkg=git state=latest update_cache=yes
