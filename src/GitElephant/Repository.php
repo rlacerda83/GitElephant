@@ -439,12 +439,12 @@ class Repository
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      * @return array
      */
-    public function getBranches($namesOnly = false, $all = false)
+    public function getBranches($namesOnly = false, $all = false, $containText = null)
     {
         $branches = array();
         if ($namesOnly) {
             $outputLines = $this->caller->execute(
-                BranchCommand::getInstance($this)->listBranches($all, true)
+                BranchCommand::getInstance($this)->listBranches($all, true, $containText)
             )->getOutputLines(true);
             $branches = array_map(
                 function ($v) {
@@ -454,7 +454,7 @@ class Repository
             );
         } else {
             $outputLines = $this->caller->execute(
-                BranchCommand::getInstance($this)->listBranches($all)
+                BranchCommand::getInstance($this)->listBranches($all, false, $containText)
             )->getOutputLines(true);
             foreach ($outputLines as $branchLine) {
                 $branches[] = Branch::createFromOutputLine($this, $branchLine);
@@ -498,7 +498,7 @@ class Repository
     public function getBranch($name)
     {
         /** @var Branch $branch */
-        foreach ($this->getBranches() as $branch) {
+        foreach ($this->getBranches(false, false, $name) as $branch) {
             if ($branch->getName() == $name) {
                 return $branch;
             }
@@ -573,6 +573,16 @@ class Repository
         }
 
         $this->caller->execute(MergeCommand::getInstance($this)->merge($branch, $message, $options));
+
+        return $this;
+    }
+
+    /**
+     * @return Repository
+     */
+    public function abortMerge()
+    {
+        $this->caller->execute(MergeCommand::getInstance($this)->abortMerge());
 
         return $this;
     }
@@ -803,7 +813,31 @@ class Repository
      */
     public function getLog($ref = 'HEAD', $path = null, $limit = 10, $offset = null, $firstParent = false)
     {
-        return new Log($this, $ref, $path, $limit, $offset, $firstParent);
+        $log = new Log($this);
+        return $log->showLog($ref, $path, $limit, $offset, $firstParent);
+    }
+
+    /**
+     * @param string $ref
+     * @param $text
+     * @param null $branchName
+     * @param null $path
+     * @param int $limit
+     * @param null $offset
+     * @param bool $firstParent
+     * @return $this
+     */
+    public function findLog(
+        $ref = 'HEAD',
+        $text,
+        $branchName = null,
+        $path = null,
+        $limit = 100,
+        $offset = null,
+        $firstParent = false
+    ) {
+        $log = new Log($this);
+        return $log->findInLog($ref, $text, $branchName, $path, $limit, $offset, $firstParent);
     }
 
     /**

@@ -15,7 +15,8 @@
         "symfony/process": "~2.0|~3.0",
         "symfony/filesystem": "~2.0|~3.0",
         "symfony/finder": "~2.0|~3.0",
-        "phpcollection/phpcollection": "~0.4"
+        "phpcollection/phpcollection": "~0.4",
+        "sinergi/browser-detector": "^6.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.8",

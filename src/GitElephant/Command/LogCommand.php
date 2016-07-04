@@ -118,4 +118,74 @@ class LogCommand extends BaseCommand
 
         return $this->getCommand();
     }
+
+    /**
+     * @param $ref
+     * @param $text
+     * @param $branchName
+     * @param null $path
+     * @param null $limit
+     * @param null $offset
+     * @param bool $firstParent
+     * @return string
+     */
+    public function findInLog(
+        $ref,
+        $text,
+        $branchName,
+        $path = null,
+        $limit = null,
+        $offset = null,
+        $firstParent = false
+    ) {
+        $this->clearAll();
+
+        $this->addCommandName(self::GIT_LOG);
+        $this->addCommandArgument('--pretty=raw');
+        $this->addCommandArgument('--no-color');
+
+        if (null !== $limit) {
+            $limit = (int) $limit;
+            $this->addCommandArgument('--max-count=' . $limit);
+        }
+
+        if (null !== $offset) {
+            $offset = (int) $offset;
+            $this->addCommandArgument('--skip=' . $offset);
+        }
+
+        if (true === $firstParent) {
+            $this->addCommandArgument('--first-parent');
+        }
+
+        if ($ref instanceof TreeishInterface) {
+            $ref = $ref->getSha();
+        }
+
+        if (null !== $path && !empty($path)) {
+            $this->addPath($path);
+        }
+
+        if (null !== $text && !empty($text)) {
+            $this->addCommandArgument(
+                sprintf(
+                    '--grep=%s',
+                    $text
+                )
+            );
+        }
+
+        if (null !== $branchName && !empty($branchName)) {
+            $this->addCommandArgument(
+                sprintf(
+                    '--not --remotes=*/%s',
+                    $branchName
+                )
+            );
+        }
+
+        $this->addCommandSubject($ref);
+
+        return $this->getCommand();
+    }
 }

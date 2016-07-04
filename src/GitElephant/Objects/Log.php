@@ -67,50 +67,69 @@ class Log implements \ArrayAccess, \Countable, \Iterator
     }
 
     /**
-     * Class constructor
-     *
-     * @param \GitElephant\Repository $repository  repo
-     * @param string                  $ref         treeish reference
-     * @param null                    $path        path
-     * @param int                     $limit       limit
-     * @param null                    $offset      offset
-     * @param boolean                 $firstParent first parent
-     *
-     * @throws \RuntimeException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * Log constructor.
+     * @param Repository $repository
      */
     public function __construct(
-        Repository $repository,
+        Repository $repository
+
+    ) {
+        $this->repository = $repository;
+    }
+
+    /**
+     * @param string $ref
+     * @param null $path
+     * @param int $limit
+     * @param null $offset
+     * @param bool $firstParent
+     * @return $this
+     */
+    public function showLog(
         $ref = 'HEAD',
         $path = null,
         $limit = 15,
         $offset = null,
         $firstParent = false
     ) {
-        $this->repository = $repository;
-        $this->createFromCommand($ref, $path, $limit, $offset, $firstParent);
-    }
-
-    /**
-     * get the commit properties from command
-     *
-     * @param string  $ref         treeish reference
-     * @param string  $path        path
-     * @param int     $limit       limit
-     * @param string  $offset      offset
-     * @param boolean $firstParent first parent
-     *
-     * @throws \RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @see ShowCommand::commitInfo
-     */
-    private function createFromCommand($ref, $path, $limit, $offset, $firstParent)
-    {
         $command = LogCommand::getInstance($this->getRepository())->showLog($ref, $path, $limit, $offset, $firstParent);
         $outputLines = $this->getRepository()->getCaller()->execute($command)->getOutputLines(true);
         $this->parseOutputLines($outputLines);
+        return $this;
+    }
+
+    /**
+     * @param string $ref
+     * @param $text
+     * @param $branchName
+     * @param null $path
+     * @param int $limit
+     * @param null $offset
+     * @param bool $firstParent
+     * @return $this
+     */
+    public function findInLog(
+        $ref = 'HEAD',
+        $text,
+        $branchName,
+        $path = null,
+        $limit = 30,
+        $offset = null,
+        $firstParent = false
+    ) {
+        $command = LogCommand::getInstance($this->getRepository())->findInLog(
+            $ref,
+            $text,
+            $branchName,
+            $path,
+            $limit,
+            $offset,
+            $firstParent
+        );
+
+        $outputLines = $this->getRepository()->getCaller()->execute($command)->getOutputLines(true);
+        $this->parseOutputLines($outputLines);
+        return $this;
     }
 
     private function parseOutputLines($outputLines)

@@ -182,14 +182,15 @@ class Commit implements TreeishInterface, \Countable
     }
 
     /**
-     * get the branches this commit is contained in
+     * @param bool $onlyRemoteTrackingBranch
+     * @return array
      *
      * @see BranchCommand::contains
      */
-    public function getContainedIn()
+    public function getContainedIn($onlyRemoteTrackingBranch = false)
     {
-        $command = BranchCommand::getInstance($this->getRepository())->contains($this->getSha());
-
+        $command = BranchCommand::getInstance($this->getRepository())
+            ->contains($this->getSha(), $onlyRemoteTrackingBranch);
         return array_map('trim', (array)$this->getCaller()->execute($command)->getOutputLines(true));
     }
 

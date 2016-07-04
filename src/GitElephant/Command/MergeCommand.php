@@ -90,4 +90,17 @@ class MergeCommand extends BaseCommand
             self::MERGE_OPTION_NO_FF => self::MERGE_OPTION_NO_FF,
         );
     }
+
+    /**
+     * @return string
+     */
+    public function abortMerge()
+    {
+        $this->clearAll();
+        $this->addCommandName(static::MERGE_COMMAND);
+
+        $this->addCommandArgument('--abort');
+
+        return $this->getCommand();
+    }
 }

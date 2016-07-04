@@ -22,6 +22,7 @@ namespace GitElephant\Command\Caller;
 use GitElephant\Exception\InvalidRepositoryPathException;
 use \GitElephant\GitBinary;
 use \Symfony\Component\Process\Process;
+use Sinergi\BrowserDetector\Os;
 
 /**
  * Caller
@@ -59,6 +60,11 @@ class Caller implements CallerInterface
     private $rawOutput;
 
     /**
+     * @var Os
+     */
+    private $os;
+
+    /**
      * Class constructor
      *
      * @param \GitElephant\GitBinary $binary         the binary
@@ -73,6 +79,7 @@ class Caller implements CallerInterface
         }
 
         $this->repositoryPath = $repositoryPath;
+        $this->os = new Os();
     }
 
     /**
@@ -117,8 +124,13 @@ class Caller implements CallerInterface
             throw new \RuntimeException($text);
         }
         $this->rawOutput = $process->getOutput();
-        // rtrim values
-        $values = array_map('rtrim', explode(PHP_EOL, $process->getOutput()));
+
+        if ($this->os->getName() === Os::WINDOWS) {
+            $values = array_map('rtrim', explode("\n", $process->getOutput()));
+        } else {
+            $values = array_map('rtrim', explode(PHP_EOL, $process->getOutput()));
+        }
+
         $this->outputLines = $values;
 
         return $this;

@@ -45,15 +45,21 @@ class BranchCommand extends BaseCommand
      * Locate branches that contain a reference
      *
      * @param string $reference reference
+     * @param bool $onlyRemoteTrackingBranch onlyRemoteTrackingBranch
      *
      * @throws \RuntimeException
      * @return string the command
      */
-    public function contains($reference)
+    public function contains($reference, $onlyRemoteTrackingBranch)
     {
         $this->clearAll();
         $this->addCommandName(self::BRANCH_COMMAND);
+
+        if ($onlyRemoteTrackingBranch) {
+            $this->addCommandArgument('-r');
+        }
         $this->addCommandArgument('--contains');
+
         $this->addCommandSubject($reference);
 
         return $this->getCommand();
@@ -85,11 +91,12 @@ class BranchCommand extends BaseCommand
      *
      * @param bool $all    lists all remotes
      * @param bool $simple list only branch names
+     * @param string $containText filter by text
      *
      * @throws \RuntimeException
      * @return string the command
      */
-    public function listBranches($all = false, $simple = false)
+    public function listBranches($all = false, $simple = false, $containText = null)
     {
         $this->clearAll();
         $this->addCommandName(self::BRANCH_COMMAND);
@@ -101,6 +108,15 @@ class BranchCommand extends BaseCommand
         if ($all) {
             $this->addCommandArgument('-a');
         }
+
+//        if ($containText) {
+//            $this->addCommandSubject2(
+//                sprintf(
+//                    " | grep %s",
+//                    $containText
+//                )
+//            );
+//        }
 
         return $this->getCommand();
     }

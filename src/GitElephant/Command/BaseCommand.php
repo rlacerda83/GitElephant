@@ -321,7 +321,6 @@ class BaseCommand
         $command .= $this->getCLIPath();
 
         $command = preg_replace('/\\s{2,}/', ' ', $command);
-
         return trim($command);
     }
 
