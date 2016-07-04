@@ -60,11 +60,6 @@ class Caller implements CallerInterface
     private $rawOutput;
 
     /**
-     * @var Os
-     */
-    private $os;
-
-    /**
      * Class constructor
      *
      * @param \GitElephant\GitBinary $binary         the binary
@@ -79,7 +74,6 @@ class Caller implements CallerInterface
         }
 
         $this->repositoryPath = $repositoryPath;
-        $this->os = new Os();
     }
 
     /**
@@ -125,7 +119,7 @@ class Caller implements CallerInterface
         }
         $this->rawOutput = $process->getOutput();
 
-        if ($this->os->getName() === Os::WINDOWS) {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $values = array_map('rtrim', explode("\n", $process->getOutput()));
         } else {
             $values = array_map('rtrim', explode(PHP_EOL, $process->getOutput()));
